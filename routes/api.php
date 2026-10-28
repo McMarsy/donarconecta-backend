@@ -1,0 +1,30 @@
+<?php
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ApiController;
+Route::post('/login',[AuthController::class,'login']);
+Route::post('/forgot-password',[AuthController::class,'forgot']);
+Route::post('/reset-password',[AuthController::class,'reset']);
+Route::middleware('auth:sanctum')->group(function(){
+ Route::get('/me',[AuthController::class,'me']);Route::post('/logout',[AuthController::class,'logout']);
+ Route::get('/dashboard',[ApiController::class,'dashboard']);
+ Route::get('/inventario/movimientos',[ApiController::class,'movements']);
+ Route::get('/inventario/{id}/movimientos',[ApiController::class,'movements'])->whereNumber('id');
+ Route::post('/inventario/{type}',[ApiController::class,'movement'])->where('type','entrada|salida');
+ Route::post('/asignaciones',[ApiController::class,'assignment']);
+ Route::post('/entregas',[ApiController::class,'delivery']);
+ Route::post('/entregas/{id}/evidencia',[ApiController::class,'evidence'])->whereNumber('id');
+ Route::get('/entregas/{id}/evidencia',[ApiController::class,'evidenceList'])->whereNumber('id');
+ Route::get('/donaciones/{id}/trazabilidad',[ApiController::class,'tracking'])->whereNumber('id');
+ Route::get('/donaciones/{id}/historial',[ApiController::class,'history'])->whereNumber('id');
+ Route::get('/donantes/{id}/donaciones',fn(\Illuminate\Http\Request $r,int $id)=>app(ApiController::class)->related($r,'donantes',$id,'donaciones'))->whereNumber('id');
+ Route::get('/beneficiarios/{id}/solicitudes',fn(\Illuminate\Http\Request $r,int $id)=>app(ApiController::class)->related($r,'beneficiarios',$id,'solicitudes'))->whereNumber('id');
+ Route::get('/beneficiarios/{id}/ayudas',fn(\Illuminate\Http\Request $r,int $id)=>app(ApiController::class)->related($r,'beneficiarios',$id,'ayudas'))->whereNumber('id');
+ Route::get('/reportes/{type}',[ApiController::class,'report']);
+ Route::patch('/users/{id}/status',[ApiController::class,'userStatus'])->whereNumber('id');
+ Route::get('/{resource}',[ApiController::class,'index']);
+ Route::post('/{resource}',[ApiController::class,'store']);
+ Route::get('/{resource}/{id}',[ApiController::class,'show'])->whereNumber('id');
+ Route::put('/{resource}/{id}',[ApiController::class,'update'])->whereNumber('id');
+ Route::patch('/{resource}/{id}/estado',[ApiController::class,'state'])->whereNumber('id');
+});
